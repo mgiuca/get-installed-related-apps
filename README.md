@@ -11,7 +11,7 @@ navigator.getInstalledRelatedApps().then(function(listOfInstalledApps) {
 });
 ```
 
-* [Explainer document](docs/explainer.md), a high-level overview of the proposal.
+* [Explainer document](EXPLAINER.md), a high-level overview of the proposal.
 
 ## Licensing and contributions
 
