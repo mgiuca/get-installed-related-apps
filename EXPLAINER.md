@@ -3,11 +3,11 @@
 # Abstract
 As the capabilities of the web grow, the functionality of web apps begins to
 match that of corresponding native apps. The situation of users having a web
-app, and the corresponding native app, both installed on the same device will
+app and the corresponding native app both installed on the same device will
 become more common, and the feature sets of these apps will converge.
 
-To allow web apps to detect this situation is important to allow the web app to
-defer functionality that should be provided by the native app.
+It is important to allow apps to detect this situation to allow them to disable 
+functionality that should be provided by the other app.
 
 The GetInstalledRelatedApps API allows web apps to detect if related native apps
 are installed on the current device.
