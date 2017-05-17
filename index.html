@@ -2,37 +2,270 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Get Installed Related Apps API</title>
-    <script src="http://www.w3.org/Tools/respec/respec-w3c-common" class="remove"></script>
+    <title>
+      Get Installed Related Apps API
+    </title>
+    <script src="http://www.w3.org/Tools/respec/respec-w3c-common" class=
+    "remove"></script>
     <script class='remove'>
       var respecConfig = {
-                  specStatus: "webspec"
-              ,   shortName: "get-installed-related-apps"
-              ,   editors: [{
-                  }]
+        specStatus: "ED",
+        edDraftURI: "https://wicg.github.io/get-installed-related-apps/",
+        shortName: "get-installed-related-apps",
+        processVersion: 2017,
+        editors: [{
+          name: "Matt Giuca",
+          company: "Google Inc.",
+          companyURL: "https://google.com"
+        }],
+        otherLinks: [{
+          key: 'Repository',
+          data: [{
+            value: 'Github project.',
+            href: 'https://github.com/WICG/get-installed-related-apps'
+          }, {
+            value: 'Issue tracker.',
+            href: 'https://github.com/WICG/get-installed-related-apps/issues'
+          }, {
+            value: 'Commit history.',
+            href: 'https://github.com/WICG/get-installed-related-apps/commits/master'
+          }]
+        }, {
+          key: "Implementation status",
+          data: [{
+            value: "Chromium",
+            href: "https://www.chromestatus.com/features/5695378309513216"
+          }]
+        }]
       };
     </script>
   </head>
   <body>
     <section id="abstract">
       <p>
-        This specification does all manners of neat stuff.
+        This specification defines an API for detecting whether a website's
+        related applications, as defined in the Web App Manifest, are installed
+        on the underlying application platform.
       </p>
     </section>
     <section id="sotd">
       <p>
-        Pay no attention to this section at this time.
+        This is an early draft of the getInstalledRelatedApps spec. The
+        following links are probably broken.
       </p>
     </section>
-
-    <section id="introduction">
-      <h2>Introduction</h2>
+    <section class="informative">
+      <h2>
+        Usage Examples
+      </h2>
       <p>
-        There is a theory which states that if ever anybody discovers exactly what the Universe is
-        for and why it is here, it will instantly disappear and be replaced by something even more
-        bizarre and inexplicable. There is another theory which states that this has already
-        happened.
+        <strong>TODO(mgiuca): THIS IS WEB SHARE</strong>
       </p>
+      <p>
+        This example shows a basic share operation. In response to a button
+        click, this JavaScript code shares the current page's URL.
+      </p>
+      <pre class="example javascript" title="Basic usage">
+        shareButton.addEventListener('click', () =&gt; {
+          navigator.share({title: 'Example Page', url: window.location.href})
+              .then(console.log('Share successful'));
+        });
+      </pre>
+      <p>
+        In response to this call to <code>navigator.share</code>, the user
+        agent would display a picker or chooser dialog, allowing the user to
+        select a target to share this title and URL to.
+      </p>
+    </section>
+    <section>
+      <h2>
+        API definition
+      </h2>
+      <section data-dfn-for="Navigator">
+        <h3>
+          <code>Navigator</code> interface
+        </h3>
+        <p>
+          The <code><dfn data-cite="!HTML#navigator">Navigator</dfn></code>
+          interface is defined in [[!HTML]].
+        </p>
+        <pre class="idl">
+          partial interface Navigator {
+            [SecureContext] Promise&lt;sequence&lt;RelatedApplication&gt;&gt;
+            getInstalledRelatedApps();
+          };
+        </pre>
+        <section>
+          <h4>
+            <code>getInstalledRelatedApps</code> method
+          </h4>
+          <p>
+            When the <dfn>getInstalledRelatedApps</dfn> method is called, run
+            the following steps:
+          </p>
+          <p>
+            <strong>TODO(mgiuca): THIS IS WEB SHARE</strong>
+          </p>
+          <ol>
+            <li>Let <var>p</var> be a newly created promise.
+            </li>
+            <li>If the method call was not <a data-cite=
+            "!HTML#triggered-by-user-activation">triggered by user
+            activation</a>, reject <var>p</var> with <a data-cite=
+            "!WEBIDL#securityerror"><code>SecurityError</code></a>, and abort
+            these steps.
+            </li>
+            <li>
+              <a data-cite="!HTML#in-parallel">In parallel</a>:
+              <ol>
+                <li>If there are no <a>share targets</a> available, reject
+                <var>p</var> with <a data-cite=
+                "!WEBIDL#aborterror"><code>AbortError</code></a>, and abort
+                these steps.
+                </li>
+                <li>Present the user with a choice of one or more <a>share
+                targets</a>, selected at the user agent's discretion. The user
+                MUST be given the option to cancel rather than choosing any of
+                the share targets. Wait for the user's choice.
+                </li>
+                <li>If the user chose to cancel the share operation, reject
+                <var>p</var> with <a data-cite=
+                "!WEBIDL#aborterror"><code>AbortError</code></a>, and abort
+                these steps.
+                </li>
+                <li>Activate the chosen <a>share target</a>, <a>convert
+                <var>data</var> to a format suitable for ingestion into the
+                target</a>, and transmit the converted data to the target. If
+                an error occurs starting the target or transmitting the data,
+                or if the target <a>declines to receive the data</a>, reject
+                <var>p</var> with <a data-cite=
+                "!WEBIDL#aborterror"><code>AbortError</code></a>, and abort
+                these steps.
+                </li>
+                <li>Once the data has been successfully transmitted to the
+                target, resolve <var>p</var>.
+                </li>
+              </ol>
+            </li>
+            <li>Return <var>p</var>.
+            </li>
+          </ol>
+          <div class="note">
+            <a for="Navigator"><code>share</code></a> always shows some form of
+            UI, to give the user a choice of application and get their approval
+            to invoke and send data to a potentially native application (which
+            carries a security risk). For this reason, user agents MUST still
+            show UI even if there is only a single share target, and MUST NOT
+            perform any kind of "always use this target" to bypass the UI in
+            subsequent share operations.
+          </div>
+          <div class="note">
+            The user agent MAY differentiate between the three different causes
+            of <a data-cite="!WEBIDL#aborterror"><code>AbortError</code></a>
+            failure (e.g., with a different error string in each case).
+            However, it MUST NOT expose the identity of the target chosen by
+            the user, or reveal the identity of any of the available targets.
+          </div>
+        </section>
+      </section>
+      <section data-dfn-for="RelatedApplication">
+        <h3>
+          <code>RelatedApplication</code> dictionary
+        </h3>
+        <pre class="idl">
+          dictionary RelatedApplication {
+            DOMString platform;
+            DOMString id;
+            DOMString url;
+            DOMString min_version;
+            sequence&lt;Fingerprint&gt; fingerprints;
+          };
+
+          dictionary Fingerprint {
+            DOMString type;
+            DOMString value;
+          };
+        </pre>
+        <p>
+          <strong>TODO(mgiuca): THIS IS WEB SHARE</strong>
+        </p>
+        <p>
+          The <dfn>ShareData</dfn> dictionary consists of several optional
+          fields:
+        </p>
+        <ul>
+          <li>
+            <dfn>title</dfn>: The title of the document being shared. May be
+            ignored by the target.
+          </li>
+          <li>
+            <dfn>text</dfn>: Arbitrary text that forms the body of the message
+            being shared.
+          </li>
+          <li>
+            <dfn>url</dfn>: A <a data-cite="!URL#valid-url-string">valid URL
+            string</a> referring to a resource being shared.
+          </li>
+        </ul>
+        <div class="note">
+          These fields are <a data-cite=
+          "!WEBIDL#idl-USVString"><code>USVString</code></a> (as opposed to
+          <a data-cite="!WEBIDL#idl-DOMString"><code>DOMString</code></a>)
+          because they must not contain invalid <a data-cite=
+          "rfc2781#section-2">UTF-16</a> surrogates. This means the user agent
+          is free to re-encode them in any Unicode encoding (e.g.,
+          <a data-cite="rfc3629#section-3">UTF-8</a>).
+        </div>
+      </section>
+    </section>
+    <section class="informative">
+      <h2>
+        Security and privacy considerations
+      </h2>
+      <p>
+        Implementations should observe the following security and privacy
+        advice.
+      </p>
+      <p>
+        <strong>TODO(mgiuca): THIS IS WEB SHARE</strong>
+      </p>
+      <p>
+        Web Share enables data to be sent from websites to native applications.
+        While this ability is not unique to Web Share, it does come with a
+        number of potential security issues that may vary in severity
+        (depending on the underlying platform).
+      </p>
+      <ul>
+        <li>User agents MUST NOT allow the website to learn which apps are
+        installed, or which app was chosen from
+        <a><code>navigator.share</code></a>. This information could be used for
+        fingerprinting, as well as leaking details about the user's device.
+        </li>
+        <li>On every call to <a><code>navigator.share</code></a>, the user MUST
+        be presented with a dialog asking them to select a target application
+        (even if there is only one possible target). This surface serves as a
+        security confirmation, ensuring that websites cannot silently send data
+        to native applications.
+        </li>
+        <li>Due to the capabilities of the API surface,
+        <a><code>navigator.share</code></a> is <a data-cite=
+        "WEBIDL#dfn-available-only-in-secure-contexts">available only in secure
+        contexts</a> (such as <code>https://</code> schemes).
+        </li>
+        <li>Use of <a><code>navigator.share</code></a> from a <a href=
+        "https://en.wikipedia.org/wiki/Privacy_mode">private browsing mode</a>
+        may leak private data to a third-party application that does not
+        respect the user's privacy setting. User agents should consider
+        presenting additional warnings or disabling the feature entirely when
+        in a private browsing mode.
+        </li>
+        <li>The data passed to <a><code>navigator.share</code></a> may be used
+        to exploit buffer overflow or other remote code execution
+        vulnerabilities in native applications that receive shares. There is no
+        general way to guard against this, but implementors should be aware
+        that it is a possibility.
+        </li>
+      </ul>
     </section>
   </body>
 </html>
