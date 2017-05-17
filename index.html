@@ -59,22 +59,66 @@
         Usage Examples
       </h2>
       <p>
-        <strong>TODO(mgiuca): THIS IS WEB SHARE</strong>
+        This example shows the basic usage of
+        <code>getInstalledRelatedApps</code>. In the Web App Manifest, the site
+        must declare at least one <a>related application</a>. Then, in
+        JavaScript, the site may request the list of related applications that
+        are installed on the system. This will be a subset of the
+        <code>related_applications</code> array from the manifest.
       </p>
-      <p>
-        This example shows a basic share operation. In response to a button
-        click, this JavaScript code shares the current page's URL.
-      </p>
-      <pre class="example javascript" title="Basic usage">
-        shareButton.addEventListener('click', () =&gt; {
-          navigator.share({title: 'Example Page', url: window.location.href})
-              .then(console.log('Share successful'));
-        });
+      <pre class="example json" title="Manifest (from Web App Manifest spec)">
+        {
+          "related_applications": [
+              {
+                "platform": "play",
+                "url": "https://play.google.com/store/apps/details?id=com.example.app1",
+                "id": "com.example.app1",
+                "min_version": "2",
+                "fingerprints": [{
+                  "type": "sha256_cert",
+                  "value": "92:5A:39:05:C5:B9:EA:BC:71:48:5F:F2"
+                }]
+              }, {
+                "platform": "itunes",
+                "url": "https://itunes.apple.com/app/example-app1/id123456789",
+              }]
+         }
+      </pre>
+      <pre class="example javascript" title="Basic API usage">
+        async function logInstalledRelatedApps() {
+          let installed_apps = await navigator.getInstalledRelatedApps();
+          for (const app of installed_apps) {
+            console.log('platform:', app.platform);
+            console.log('url:', app.url);
+            console.log('id:', app.id);
+            console.log('min_version:', app.min_version);
+            console.log('fingerprints:', app.fingerprints);
+          }
+        }
       </pre>
       <p>
-        In response to this call to <code>navigator.share</code>, the user
-        agent would display a picker or chooser dialog, allowing the user to
-        select a target to share this title and URL to.
+        This can be used to determine whether a particular application on a
+        given platform is installed, as shown in this example:
+      </p>
+      <pre class="example javascript" title=
+      "Determining whether a website's related Android app is installed">
+        async function isMyAndroidAppInstalled() {
+          let installed_apps = await navigator.getInstalledRelatedApps();
+          for (const app of installed_apps) {
+            if (app.platform === 'play' &amp;& app.id === 'com.example.app1')
+              return true;
+          }
+          return false;
+        }
+
+        isMyAndroidAppInstalled().then(installed =&gt;
+            console.log('Android app installed:', installed));
+      </pre>
+      <p>
+        This allows the web site author to make user-facing decisions with the
+        knowledge of whether the user already has the equivalent native
+        application installed (for example, not showing notifications if the
+        native application is already doing so).
       </p>
     </section>
     <section>
