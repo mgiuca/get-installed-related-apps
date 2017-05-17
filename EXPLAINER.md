@@ -13,18 +13,17 @@ The GetInstalledRelatedApps API allows web apps to detect if related native apps
 are installed on the current device.
 
 # Querying the installed local apps that specify the website.
+
+From an `async` function:
+
 ```js
-navigator.getInstalledRelatedApps().then(function(listOfInstalledApps) {
-    // success
-    for (var app of listOfInstalledApps) {
-        // These fields are specified by the Web App Manifest spec.
-        console.log(app.platform);
-        console.log(app.url);
-        console.log(app.id);
-    }
-}, function() {
-    // failure
-});
+let listOfInstalledApps = await navigator.getInstalledRelatedApps();
+for (const app of listOfInstalledApps) {
+  // These fields are specified by the Web App Manifest spec.
+  console.log('platform:', app.platform);
+  console.log('url:', app.url);
+  console.log('id:', app.id);
+}
 ```
 
 # Describing a relationship from native application to website (and vice versa)
