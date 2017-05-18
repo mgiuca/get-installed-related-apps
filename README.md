@@ -6,9 +6,7 @@ This site details a proposal to add an API to the web for determining if related
 native apps are installed:
 
 ```js
-navigator.getInstalledRelatedApps().then(function(listOfInstalledApps) {
-  ...
-});
+let listOfInstalledApps = await navigator.getInstalledRelatedApps();
 ```
 
 * [Explainer document](EXPLAINER.md), a high-level overview of the proposal.
